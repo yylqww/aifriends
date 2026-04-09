@@ -7,6 +7,7 @@ import FriendIcon from "@/components/navbar/icons/FriendIcon.vue";
 
 <template>
   <NavBar>
+    <RouterView />
   </NavBar>
 
 </template>
