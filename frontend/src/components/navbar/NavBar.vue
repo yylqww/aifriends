@@ -20,7 +20,7 @@ import SearchIcon from "@/components/navbar/icons/SearchIcon.vue";
           <div class="px-0 font-bold text-xl">AIFriends</div>
         </div>
         <div class="navbar-center w-full max-w-180 flex justify-center">
-          <div class="join w-4/5">
+          <div class="join w-4/5 flex  justify-center">
             <input
               class="input border-black join-item w-full !rounded-l-full focus:outline-none focus:border-black px-6"
               placeholder="搜索你感兴趣的内容"
