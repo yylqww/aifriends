@@ -19,11 +19,11 @@ interface UserState {
 
 export const useUserStore = defineStore('user', () => {
     // 状态
-    const id = ref<number>(1);
-    const username = ref<string>('qww');
-    const photo = ref<string>('http://127.0.0.1:8000/media/user/photos/default.png');
-    const profile = ref<string>('1');
-    const accessToken = ref<string>('1');
+    const id = ref<number>(0);
+    const username = ref<string>('');
+    const photo = ref<string>('');
+    const profile = ref<string>('');
+    const accessToken = ref<string>('');
 
     // 判断是否登录
     const isLogin = (): boolean => {

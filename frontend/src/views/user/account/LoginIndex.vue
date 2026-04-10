@@ -1,4 +1,43 @@
 <script setup lang="ts">
+import {ref} from "vue";
+
+import {useUserStore} from "@/stores/user.ts";
+import {useRouter} from "vue-router";
+import api from "@/js/http/api.ts";
+
+const username = ref('')
+const password = ref('')
+const errorMessage = ref('')
+const user = useUserStore()
+const router = useRouter()
+
+async function handleLogin(){
+  errorMessage.value = ''
+  if(!username.value.trim()) {
+    errorMessage.value = '用户名不能为空 '
+  }else if(!password.value.trim()){
+    errorMessage.value = '密码不能为空'
+  }else{
+    try{
+      const res = await api.post('/api/user/account/login/',{
+        username:username.value,
+        password:password.value,
+      })
+      const data = res.data
+      if(data.result === 'success'){
+        user.setAccessToken(data.access)
+        user.setUserInfo(data)
+        await router.push({
+          name: 'homepage-index'
+        })
+      }else{
+        errorMessage.value = data.result
+      }
+    }catch (err){
+      console.log(err)
+    }
+  }
+}
 
 </script>
 
@@ -7,11 +46,12 @@
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100">
     <div class="w-full max-w-md px-6">
       <fieldset class="fieldset bg-white rounded-2xl shadow-xl border-0 p-8">
-        <div class="space-y-4">
+        <form @submit.prevent="handleLogin" class="space-y-4">
           <div>
             <label class="label text-sm font-medium text-gray-700 mb-1">用户名</label>
             <input
-              type="email"
+              v-model="username"
+              type="text"
               class="input w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
               placeholder="用户名"
             />
@@ -20,11 +60,14 @@
           <div>
             <label class="label text-sm font-medium text-gray-700 mb-1">密码</label>
             <input
+              v-model="password"
               type="password"
               class="input w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
               placeholder="密码"
             />
           </div>
+
+          <p  class="text-sm text-red-500 mt-1">{{ errorMessage}}</p>
 
           <div class="flex items-center justify-between text-sm">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -43,7 +86,7 @@
               <div class="w-full border-t border-gray-300"></div>
             </div>
           </div>
-        </div>
+        </form>
 
         <p class="text-center text-sm text-gray-600 mt-6">
           还没有账号？
