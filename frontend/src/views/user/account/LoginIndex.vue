@@ -11,6 +11,7 @@ const errorMessage = ref('')
 const user = useUserStore()
 const router = useRouter()
 
+
 async function handleLogin(){
   errorMessage.value = ''
   if(!username.value.trim()) {
@@ -34,7 +35,6 @@ async function handleLogin(){
         errorMessage.value = data.result
       }
     }catch (err){
-      console.log(err)
     }
   }
 }

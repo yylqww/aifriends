@@ -33,10 +33,9 @@ async function handleLogin(){
           name:'homepage-index'
         })
       }else{
-        errorMessage.value = data.result 
+        errorMessage.value = data.result
       }
     }catch (err){
-      console.log(err)
     }
   }
 }

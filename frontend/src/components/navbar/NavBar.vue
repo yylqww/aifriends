@@ -35,14 +35,24 @@ const user = useUserStore()
           </div>
         </div>
         <div class="navbar-end">
-          <RouterLink v-if="user.isLogin()" :to="{name: 'create-index'}" active-class="btn-active" class="btn btn-ghost text-base mr-6">
-            <CreateIcon />
-            创作
-          </RouterLink>
-          <RouterLink v-if="!user.isLogin()" :to="{name: 'user-account-login-index'}" active-class="btn-active" class="btn btn-soft">
-            登录
-          </RouterLink>
-          <UserMenu v-else />
+          <template v-if="user.accessToken && !user.hasPulledUserInfo">
+            <button class="btn btn-ghost">
+              <span class="loading loading-spinner loading-sm"></span>
+            </button>
+          </template>
+
+          <template v-else-if="user.isLogin()">
+            <RouterLink :to="{name: 'create-index'}" class="btn btn-ghost mr-6">
+              <CreateIcon /> 创作
+            </RouterLink>
+            <UserMenu />
+          </template>
+
+          <template v-else>
+            <RouterLink :to="{name: 'user-account-login-index'}" class="btn btn-soft">
+              登录
+            </RouterLink>
+          </template>
         </div>
       </nav>
       <slot />
