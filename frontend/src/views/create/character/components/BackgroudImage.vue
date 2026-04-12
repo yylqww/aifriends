@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import {nextTick, onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch} from "vue";
+import {nextTick, onBeforeUnmount, ref, useTemplateRef, watch} from "vue";
 import CameraIcon from "@/components/navbar/icons/CameraIcon.vue";
-import Croppie from 'croppie'
-import 'croppie/croppie.css'
+import Croppie from "croppie";
 
-const props = defineProps(['photo'])
-const myPhoto = ref(props.photo)
+const props = defineProps(['backgroundImage'])
+const myBackgroundImage = ref(props.backgroundImage)
 
-watch(() => props.photo, newVal => {
-  myPhoto.value = newVal
+watch(() => props.backgroundImage, newVal =>{
+  myBackgroundImage.value =newVal
 })
 
 const fileInputRef = useTemplateRef('file-input-ref')
@@ -26,8 +25,8 @@ async function openModal(photo: string) {
 
   if(!croppie){
     croppie = new Croppie(croppieRef.value!, {
-      viewport: {width: 200, height: 200, type: 'square'},
-      boundary: {width: 300, height: 300},
+      viewport: {width: 300, height: 500},
+      boundary: {width: 600, height: 600},
       enableOrientation: true,
       enforceBoundary: true,
     })
@@ -39,7 +38,7 @@ async function openModal(photo: string) {
 
 async function crop(){
   if(!croppie) return
-  myPhoto.value = await croppie.result({
+  myBackgroundImage.value = await croppie.result({
     type: 'base64',
     size:'viewport',
   })
@@ -69,25 +68,30 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
-  myPhoto,
+  myBackgroundImage,
 })
 </script>
 
 <template>
-  <div class="flex justify-center">
+  <fieldset class="fieldset">
+    <label class="label text-base text-gray-900 mb-1">
+      聊天背景
+    </label>
     <div class="avatar relative">
-      <div class="w-28 rounded-full">
-        <img :src="myPhoto" />
-        <div @click="fileInputRef?.click()" class="absolute left-0 top-0 w-28 h-28 flex justify-center items-center bg-black/20 rounded-full cursor-pointer">
+      <div v-if="myBackgroundImage" class="w-15 h-25 rounded-box">
+        <img :src="myBackgroundImage" alt="">
+      </div>
+      <div @click="fileInputRef?.click()" v-else class="w-15 h-25 rounded-box bg-base-300">
+        <div class="flex justify-center items-center bg-black/20 w-15 h-25 rounded-box left-0 top-0 cursor-pointer">
           <CameraIcon />
         </div>
       </div>
     </div>
-  </div>
-  <input ref="file-input-ref" type="file" accept="image/*" class="hidden" @change="onFileChange">
+  </fieldset>
+  <input ref="file-input-ref" type="file" class="hidden" accept="image/*" @change="onFileChange">
 
   <dialog ref="modal-ref" class="modal">
-    <div class="modal-box transition-none">
+    <div class="modal-box transition-none max-w-2xl">
       <button @click="modalRef?.close()" class="btn btn-circle btn-sm btn-ghost absolute right-2 top-2">
         ×
       </button>

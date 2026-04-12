@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import {nextTick, onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch} from "vue";
+import {nextTick, onBeforeUnmount, ref, useTemplateRef, watch} from "vue";
 import CameraIcon from "@/components/navbar/icons/CameraIcon.vue";
-import Croppie from 'croppie'
-import 'croppie/croppie.css'
+import Croppie from "croppie";
 
 const props = defineProps(['photo'])
 const myPhoto = ref(props.photo)
 
-watch(() => props.photo, newVal => {
-  myPhoto.value = newVal
+watch(() => props.photo, newVal =>{
+  myPhoto.value =newVal
 })
 
 const fileInputRef = useTemplateRef('file-input-ref')
@@ -76,15 +75,17 @@ defineExpose({
 <template>
   <div class="flex justify-center">
     <div class="avatar relative">
-      <div class="w-28 rounded-full">
-        <img :src="myPhoto" />
-        <div @click="fileInputRef?.click()" class="absolute left-0 top-0 w-28 h-28 flex justify-center items-center bg-black/20 rounded-full cursor-pointer">
+      <div v-if="myPhoto" class="w-28 rounded-full">
+        <img :src="myPhoto" alt="">
+      </div>
+      <div v-else class="w-28 h-28 rounded-full bg-base-200">
+        <div @click="fileInputRef?.click()" class="w-28 h-28 bg-black/20 absolute left-0 rounded-full top-0 flex justify-center items-center cursor-pointer">
           <CameraIcon />
         </div>
       </div>
     </div>
   </div>
-  <input ref="file-input-ref" type="file" accept="image/*" class="hidden" @change="onFileChange">
+  <input ref="file-input-ref" type="file" class="hidden" accept="image/*" @change="onFileChange">
 
   <dialog ref="modal-ref" class="modal">
     <div class="modal-box transition-none">
@@ -103,6 +104,7 @@ defineExpose({
       </div>
     </div>
   </dialog>
+
 </template>
 
 <style scoped>
