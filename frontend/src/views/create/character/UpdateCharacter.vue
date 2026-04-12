@@ -4,11 +4,19 @@ import Photo from "@/views/create/character/components/Photo.vue";
 import Profile from "@/views/create/character/components/Profile.vue";
 import BackgroundImage from "@/views/create/character/components/BackgroundImage.vue";
 import Name from "@/views/create/character/components/Name.vue";
-import {ref, useTemplateRef} from "vue";
+import {onMounted, ref, useTemplateRef} from "vue";
 import {base64ToFile} from "@/js/utils/base64_to_file.ts";
 import api from "@/js/http/api.ts";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useUserStore} from "@/stores/user.ts";
+
+interface Character {
+  id: number;
+  name: string;
+  profile: string;
+  photo: string;
+  background_image: string;
+}
 
 const photoRef = useTemplateRef('photo-ref')
 const nameRef = useTemplateRef('name-ref')
@@ -17,8 +25,25 @@ const backgroundImageRef = useTemplateRef('background-image-ref')
 const errorMessage = ref('')
 const user = useUserStore()
 const router = useRouter()
+const route = useRoute()
+const characterId = route.params.character_id
+const character = ref<Character | null>(null)
 
-async function handleCreate(){
+onMounted(async () => {
+  try{
+    const res = await api.get('/api/create/character/get_single/',{
+      params:{
+        character_id: characterId,
+      }
+    })
+    const data = res.data
+    if(data.result === 'success'){
+      character.value = data.character
+    }
+  }catch (err){}
+})
+
+async function handleUpdate(){
   const photo = photoRef.value?.myPhoto
   const name = nameRef.value?.myName?.trim()
   const profile = profileRef.value?.myProfile?.trim()
@@ -35,12 +60,19 @@ async function handleCreate(){
     errorMessage.value = '聊天背景不能为空'
   }else{
     const formData = new FormData()
+    formData.append('character_id', String(characterId))
     formData.append('name', name)
     formData.append('profile', profile)
-    formData.append('photo', base64ToFile(photo,'photo.png'))
-    formData.append('background_image',base64ToFile(backgroundImage,'backgound_image.png'))
+    if(photo !== character.value?.photo){
+      formData.append('photo', base64ToFile(photo,'photo.png'))
+    }
+
+    if(backgroundImage !== character.value?.background_image){
+      formData.append('background_image',base64ToFile(backgroundImage,'backgound_image.png'))
+    }
+
     try{
-      const res = await api.post('/api/create/character/create/', formData)
+      const res = await api.post('/api/create/character/update/', formData)
       const data = res.data
       if(data.result === 'success'){
         await router.push({
@@ -58,22 +90,22 @@ async function handleCreate(){
 </script>
 
 <template>
-  <div class="flex justify-center">
+  <div v-if="character" class="flex justify-center">
     <div class="card w-120 bg-base-200 shadow-sm mt-16">
       <div class="card-body">
         <h3 class="font-bold text-lg my-4">
-          创建角色
+          更新角色
         </h3>
-        <Photo ref="photo-ref" />
-        <Name ref="name-ref" />
-        <Profile ref="profile-ref" />
-        <BackgroundImage ref="background-image-ref" />
+        <Photo ref="photo-ref" :photo="character.photo" />
+        <Name ref="name-ref" :name="character.name"/>
+        <Profile ref="profile-ref" :profile="character.profile" />
+        <BackgroundImage ref="background-image-ref" :backgroundImage="character.background_image" />
         <p v-if="errorMessage" class="text-sm text-red-500">
           {{ errorMessage }}
         </p>
         <div class="flex justify-center">
-          <button @click="handleCreate" class="btn btn-accent w-20 mt-2">
-            创建
+          <button @click="handleUpdate" class="btn btn-accent w-20 mt-2">
+            更新
           </button>
         </div>
       </div>

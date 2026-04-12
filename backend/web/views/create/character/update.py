@@ -8,7 +8,7 @@ from web.views.create.character import remove
 from web.views.utils.photo import remove_old_photo
 
 
-class UpdateProfile(APIView):
+class UpdateCharacter(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
@@ -30,7 +30,7 @@ class UpdateProfile(APIView):
                 remove_old_photo(character.photo)
                 character.photo = photo
             if background_image:
-                remove_old_photo(background_image)
+                remove_old_photo(character.background_image)
                 character.background_image = background_image
             character.name = name
             character.profile = profile
@@ -39,7 +39,7 @@ class UpdateProfile(APIView):
             return Response({
                 'result': 'success'
             })
-        except:
+        except Exception as e:
             return Response({
                 'result': '系统异常，请稍后重试',
             })

@@ -78,10 +78,9 @@ defineExpose({
       <div v-if="myPhoto" class="w-28 rounded-full">
         <img :src="myPhoto" alt="">
       </div>
-      <div v-else class="w-28 h-28 rounded-full bg-base-200">
-        <div @click="fileInputRef?.click()" class="w-28 h-28 bg-black/20 absolute left-0 rounded-full top-0 flex justify-center items-center cursor-pointer">
-          <CameraIcon />
-        </div>
+      <div v-else class="w-28 h-28 rounded-full bg-base-200" />
+      <div @click="fileInputRef?.click()" class="w-28 h-28 bg-black/20 absolute left-0 rounded-full top-0 flex justify-center items-center cursor-pointer">
+        <CameraIcon />
       </div>
     </div>
   </div>

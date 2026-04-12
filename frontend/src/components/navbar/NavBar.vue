@@ -42,7 +42,7 @@ const user = useUserStore()
           </template>
 
           <template v-else-if="user.isLogin()">
-            <RouterLink :to="{name: 'create-index'}" class="btn btn-ghost mr-6">
+            <RouterLink :to="{name: 'update-character', params: {character_id: 1}}" class="btn btn-ghost mr-6">
               <CreateIcon /> 创作
             </RouterLink>
             <UserMenu />
