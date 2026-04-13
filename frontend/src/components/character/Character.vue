@@ -1,10 +1,98 @@
-<script setup lang="ts">
+<script setup>
+import {ref} from "vue";
+import RemoveIcon from "@/components/navbar/icons/RemoveIcon.vue";
+import {useUserStore} from "@/stores/user.ts";
+import UpdateIcon from "@/components/navbar/icons/UpdateIcon.vue";
+import api from "@/js/http/api.ts";
 
+const props = defineProps(['character', 'canEdit'])
+const isHover = ref(false)
+const user = useUserStore()
+const emit = defineEmits(['remove'])
+
+async function handleRemoveCharacter(){
+  // 增加二次确认，提升容错率
+  if (!confirm("确定要删除这个角色吗？")) return;
+
+  try {
+    const res = await api.post('/api/create/character/remove/', {
+      character_id: props.character.id,
+    })
+
+    if(res.data.result === 'success'){
+      // 成功后通知父组件，父组件会通过 filter 移除数据
+      emit('remove', props.character.id)
+    } else {
+      alert(res.data.result || "删除失败");
+    }
+  } catch (err) {
+  }
+}
 </script>
 
 <template>
+  <div class="group">
+    <div class="cursor-pointer overflow-hidden rounded-[1.2rem] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] border border-base-content/5 bg-base-100 hover:border-primary/30 hover:-translate-y-2"
+         @mouseover="isHover=true"
+         @mouseout="isHover=false">
 
-</template>
+      <div class="w-60 h-80 relative"> <img :src="character.background_image"
+             class="w-full h-full object-cover transition-all duration-1000"
+             :class="isHover ? 'scale-105 grayscale-0' : 'scale-100 grayscale-[0.2]'"
+             alt="background"
+             loading="lazy">
+
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+
+        <div v-if="canEdit && character.author.user_id === user.id"
+             class="absolute right-3 top-3 z-30 transition-all duration-500"
+             :class="isHover ? 'opacity-100' : 'opacity-0'">
+          <div class="flex flex-col gap-1.5 p-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
+            <RouterLink :to="{name: 'update-character', params: {character_id: character.id}}"
+                        class="btn btn-square btn-xs btn-ghost text-white hover:bg-primary/40 border-none">
+               <UpdateIcon class="w-3.5 h-3.5" />
+            </RouterLink>
+            <button @click.stop="handleRemoveCharacter"
+                    class="btn btn-square btn-xs btn-ghost text-white hover:bg-error/40 border-none">
+              <RemoveIcon class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        <div class="absolute inset-x-0 bottom-0 p-4 z-20">
+          <div class="text-[9px] font-mono text-white/40 mb-1 tracking-tighter">
+            NO.{{ String(character.id).padStart(4, '0') }}
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl overflow-hidden border border-white/30 shadow-sm transition-transform duration-500"
+                 :class="{'rotate-6': isHover}">
+              <img :src="character.photo" class="w-full h-full object-cover" alt="avatar">
+            </div>
+
+            <div class="flex-1">
+              <h2 class="text-white font-light text-lg tracking-[0.1em] truncate">
+                {{ character.name }}
+              </h2>
+              <div class="w-4 h-[1px] bg-primary transition-all duration-500" :class="isHover ? 'w-12' : 'w-4'"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <RouterLink :to="{name: 'user-space-index', params: {user_id: character.author.user_id}}"
+                class="flex items-center mt-3 px-1 gap-2 group/author w-fit">
+      <div class="w-5 h-5 rounded-full overflow-hidden ring-1 ring-base-content/10 group-hover/author:ring-primary transition-all">
+        <img :src="character.author.photo" alt="author">
+      </div>
+      <span class="text-[10px] font-medium text-base-content/40 uppercase tracking-widest group-hover/author:text-primary transition-colors">
+        {{ character.author.username }}
+      </span>
+      <div class="w-0 h-[1px] bg-base-content/10 transition-all duration-500 group-hover/author:w-8"></div>
+    </RouterLink>
+  </div>
+</template> 
 
 <style scoped>
 

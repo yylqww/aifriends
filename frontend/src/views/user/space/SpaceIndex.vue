@@ -1,10 +1,11 @@
 <script setup>
 import UserInfo from "@/views/user/space/components/UserInfo.vue";
-import {nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef} from "vue";
+import {nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch} from "vue";
 import api from "@/js/http/api.ts";
 import {useRoute, useRouter} from "vue-router";
 import {useUserStore} from "@/stores/user.ts";
 import retro from "daisyui/theme/retro/index.js";
+import Character from "@/components/character/Character.vue";
 
 const userProfile = ref(null)
 const characters = ref([])
@@ -72,13 +73,41 @@ onMounted(async() => {
 onBeforeUnmount(() => {
   observer?.disconnect()
 })
+
+watch(
+  () => route.params.user_id,
+  async (newId, oldId) => {
+    // 只有当 ID 真的变了才刷新（防止某些情况下的重复触发）
+    if (newId !== oldId) {
+      // 1. 重置所有状态
+      userProfile.value = null;
+      characters.value = [];
+      hasCharacters.value = true;
+      isLoading.value = false;
+
+      // 2. 重新加载数据
+      await loadMore();
+    }
+  }
+);
+
+function removeCharacter(characterId){
+  characters.value = characters.value.filter(c => c.id !== characterId)
+}
+
 </script>
 
 <template>
   <div class="flex flex-col items-center mb-12 ">
     <UserInfo :userProfile="userProfile"/>
-    <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-9 mt-12 justify-items-center w-full px-9">
-
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-16 mt-12 justify-items-center w-full px-9">
+      <Character
+          v-for="character in characters"
+          :key="character.id"
+          :character="character"
+          :canEdit="true"
+          @remove="removeCharacter"
+      />
     </div>
     <div ref="sentinel-ref" class="h-2 mt-8 w-100" />
     <div v-if="isLoading" class="text-gray-500 mt-4">
