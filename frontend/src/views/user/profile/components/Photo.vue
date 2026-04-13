@@ -41,7 +41,7 @@ async function crop(){
   if(!croppie) return
   myPhoto.value = await croppie.result({
     type: 'base64',
-    size:'viewport',
+    size: { width: 600, height: 600 },
   })
   await modalRef.value?.close()
 }

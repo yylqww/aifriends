@@ -51,6 +51,12 @@ async function handleRegister(){
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 px-6">
     <div class="w-full max-w-md reveal-card">
       <fieldset class="fieldset bg-white rounded-2xl shadow-xl border-0 p-8">
+        <div class="mb-8 text-center">
+          <h2 class="text-2xl font-bold text-gray-800 tracking-tight">用户注册</h2>
+          <div class="mt-2 flex justify-center">
+            <span class="inline-block w-8 h-1 bg-blue-500 rounded-full"></span>
+          </div>
+        </div>
         <form @submit.prevent="handleRegister()" class="space-y-4">
           <div class="form-group">
             <label class="label text-sm font-medium text-gray-700 mb-1 transition-colors">用户名</label>

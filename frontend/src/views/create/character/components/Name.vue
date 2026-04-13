@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import {ref, watch} from "vue";
+import { ref, watch } from "vue";
 
-const props = defineProps(['name'])
-const myName = ref(props.name)
+const props = defineProps<{
+  name?: string
+}>()
 
-watch(() => props.name, newVal =>{
-  myName.value =newVal
+const myName = ref(props.name || '')
+
+watch(() => props.name, (newVal) => {
+  myName.value = newVal || ''
 })
 
 defineExpose({
@@ -14,16 +17,21 @@ defineExpose({
 </script>
 
 <template>
-  <fieldset class="fieldset">
-    <label class="label text-base text-gray-900 mb-1">
+  <div class="form-control w-full group">
+    <label class="label text-sm font-medium text-gray-700 mb-1.5 transition-all duration-300 group-focus-within:text-blue-600 group-focus-within:translate-x-0.5">
       名字
     </label>
+
     <input
         v-model="myName"
         type="text"
-        class="input w-108"
+        class="input w-full h-11 px-4 text-sm
+               bg-gray-50/50 border-gray-200 rounded-lg
+               focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
+               transition-all duration-300 outline-none shadow-none"
+        placeholder="给你的角色起个响亮的名字"
     />
-  </fieldset>
+  </div>
 </template>
 
 <style scoped>
