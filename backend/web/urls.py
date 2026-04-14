@@ -10,7 +10,7 @@ from web.views.index import index
 from web.views.user.account.get_user_info import GetUserInfo
 from web.views.user.account.login import LoginView
 from web.views.user.account.logout import LogoutView
-from web.views.user.account.refresh_token import RefreshToken
+from web.views.user.account.refresh_token import RefreshToken, RefreshTokenView
 from web.views.user.account.register import RegisterView
 from web.views.user.profile.update import UpdateProfile
 
@@ -18,7 +18,7 @@ urlpatterns = [
     path('api/user/account/login/', LoginView.as_view()),
     path('api/user/account/logout/', LogoutView.as_view()),
     path('api/user/account/register/', RegisterView.as_view()),
-    path('api/user/account/refresh_token/', RefreshToken.as_view()),
+    path('api/user/account/refresh_token/', RefreshTokenView.as_view()),
     path('api/user/account/get_user_info/', GetUserInfo.as_view()),
     path('api/user/profile/update/', UpdateProfile.as_view()),
     path('api/create/character/create/', CreateCharacter.as_view()),

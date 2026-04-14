@@ -1,39 +1,52 @@
-import jwt
 from django.conf import settings
-from rest_framework import status
-from  rest_framework.views import APIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from datetime import timedelta
 
-class RefreshToken(APIView):
+
+class RefreshTokenView(APIView):
     def post(self, request):
         try:
             refresh_token = request.COOKIES.get('refresh_token')
             if not refresh_token:
                 return Response({
-                    'result':'refresh token不存在',
-                },status=401) #必须加，前端判断用得到
-            refresh = RefreshToken(refresh_token) #自动检查refresh,如果过期，会报异常
-            if settings.SIMPLE_JWT['ROTATE_REFRESH_TOKENS']:
+                    'result': 'refresh token不存在',
+                }, status=401)
+
+            refresh = RefreshToken(refresh_token)
+
+            if settings.SIMPLE_JWT.get('ROTATE_REFRESH_TOKENS', False):
                 refresh.set_jti()
+
                 response = Response({
-                    'result':'success',
+                    'result': 'success',
                     'access': str(refresh.access_token),
                 })
+
+                refresh_lifetime = settings.SIMPLE_JWT.get(
+                    'REFRESH_TOKEN_LIFETIME',
+                    timedelta(days=7)
+                )
+
+                secure = not settings.DEBUG
+
                 response.set_cookie(
                     key='refresh_token',
                     value=str(refresh),
                     httponly=True,
                     samesite='Lax',
-                    secure=True,
-                    max_age=86400 * 7,
+                    secure=secure,
+                    max_age=int(refresh_lifetime.total_seconds()),
                 )
                 return response
+
             return Response({
-                'result':'success',
+                'result': 'success',
                 'access': str(refresh.access_token),
             })
 
         except:
             return Response({
-                'result':'refresh token 过期了',
-            },status=401) #必须加，前端判断用得到
+                'result': 'refresh token 过期了',
+            }, status=401)

@@ -1,12 +1,9 @@
-from urllib import response
-
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from web.models.user import UserProfile
-from web.views.user.account import refresh_token
 
 
 class LoginView(APIView):
@@ -21,7 +18,7 @@ class LoginView(APIView):
    user = authenticate(username=username, password=password)
    if user:
     user_profile = UserProfile.objects.get(user=user)
-    refresh = RefreshToken.for_user(user_profile)
+    refresh = RefreshToken.for_user(user)
     response = Response({
      'result':'success',
      'access':str(refresh.access_token),

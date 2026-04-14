@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { markRaw } from "vue";
+import {markRaw, ref, useTemplateRef, watch} from "vue";
 import MenuIcon from "@/components/navbar/icons/MenuIcon.vue";
 import FriendIcon from "@/components/navbar/icons/FriendIcon.vue";
 import CreateIcon from "@/components/navbar/icons/CreateIcon.vue";
@@ -7,15 +7,46 @@ import HomepageIcon from "@/components/navbar/icons/HomepageIcon.vue";
 import SearchIcon from "@/components/navbar/icons/SearchIcon.vue";
 import { useUserStore } from "@/stores/user.ts";
 import UserMenu from "@/components/navbar/UserMenu.vue";
+import {useRoute, useRouter} from "vue-router";
+
+const searchInput = useTemplateRef<HTMLInputElement>('searchInput');
+
 
 const user = useUserStore()
+const router = useRouter()
+const route = useRoute()
+const searchQuery = ref(route.query.q?.toString() || '')
 
-// 侧边栏菜单配置
+
 const menuItems = [
   { name: 'home', label: '首页', to: 'homepage-index', icon: markRaw(HomepageIcon) },
   { name: 'friend', label: '好友', to: 'friend-index', icon: markRaw(FriendIcon) },
   { name: 'create', label: '创作', to: 'create-index', icon: markRaw(CreateIcon) },
 ]
+
+const moveCursorToEnd = () => {
+  setTimeout(() => {
+    if (searchInput.value) {
+      const len = searchInput.value.value.length;
+      searchInput.value.setSelectionRange(len, len);
+    }
+  }, 0); 
+};
+
+const handleSearch = () => {
+  const text = searchQuery.value.trim();
+
+  if (text === (route.query.q || '')) return;
+
+  router.push({
+    name: 'homepage-index',
+    query: text ? { q: text } : {}
+  });
+};
+
+watch(() => route.query.q, (newQ) => {
+  searchQuery.value = (newQ as string) || '';
+});
 </script>
 
 <template>
@@ -36,10 +67,18 @@ const menuItems = [
         <div class="navbar-center hidden md:flex w-full max-w-xl">
           <div class="join w-full rounded-full shadow-sm hover:shadow-md transition-all duration-300 border border-base-content/10 overflow-hidden bg-base-200/50">
             <input
+              ref="searchInput"
+              @focus="moveCursorToEnd"
+              v-model="searchQuery"
+              @keyup.enter="handleSearch"
               class="input join-item w-full bg-transparent border-none focus:outline-none focus:bg-base-100 transition-all px-6 text-sm"
               placeholder="搜索你感兴趣的内容..."
             />
-            <button class="btn btn-neutral join-item px-8 gap-2 border-none rounded-r-full">
+
+            <button
+              @click="handleSearch"
+              class="btn btn-neutral join-item px-8 gap-2 border-none rounded-r-full"
+            >
               <SearchIcon class="w-4 h-4 text-neutral-content" />
               <span class="font-bold text-neutral-content">搜索</span>
             </button>
