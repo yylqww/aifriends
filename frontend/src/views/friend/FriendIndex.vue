@@ -45,8 +45,6 @@ async function loadMore() {
   }
 }
 
-
-
 let observer = null
 
 onMounted(async () => {
@@ -99,11 +97,11 @@ function removeFriend(friendId){
         <span class="text-xs tracking-widest uppercase">正在加载</span>
       </div>
 
-      <div v-else-if="!hasMore && friends.length > 0" class="text-base-content/20 text-xs uppercase tracking-[0.2em]">
+      <div v-else-if="!hasFriends && friends.length > 0" class="text-base-content/20 text-xs uppercase tracking-[0.2em]">
         —— 没有更多聊天角色了  ——
       </div>
 
-      <div v-else-if="!hasMore && friends.length === 0" class="flex flex-col items-center gap-2 opacity-30 mt-20">
+      <div v-else-if="!hasFriends && friends.length === 0" class="flex flex-col items-center gap-2 opacity-30 mt-20">
         <div class="i-carbon-chat-off text-4xl"></div>
         <p class="text-sm">暂无聊天角色</p>
       </div>

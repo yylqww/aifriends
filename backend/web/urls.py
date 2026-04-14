@@ -1,5 +1,6 @@
 from django.urls import path, re_path
 
+from web.models.friend import Message
 from web.views.create.character.create import CreateCharacter
 from web.views.create.character.get_list import GetListCharacter
 from web.views.create.character.get_single import GetSingleCharacter
@@ -7,6 +8,7 @@ from web.views.create.character.remove import RemoveCharacter
 from web.views.create.character.update import UpdateCharacter
 from web.views.friend.get_list import GetListFriendView
 from web.views.friend.get_or_create import GetOrCreateView
+from web.views.friend.message.chat.chat import MessageChatView
 from web.views.friend.remove import RemoveFriendView
 from web.views.homepage.index import HomepageView
 from web.views.index import index
@@ -33,6 +35,7 @@ urlpatterns = [
     path('api/friend/get_or_create/',GetOrCreateView.as_view()),
     path('api/friend/remove/',RemoveFriendView.as_view()),
     path('api/friend/get_list/',GetListFriendView.as_view()),
+    path('api/friend/message/chat/', MessageChatView.as_view()),
     path('', index),
     re_path(r'^(?!media/|static/|assets/).*$', index)
 ]
