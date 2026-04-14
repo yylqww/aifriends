@@ -32,7 +32,7 @@ urlpatterns = [
     path('api/homepage/index/', HomepageView.as_view()),
     path('api/friend/get_or_create/',GetOrCreateView.as_view()),
     path('api/friend/remove/',RemoveFriendView.as_view()),
-    path('api/friend /get_list/',GetListFriendView.as_view()),
+    path('api/friend/get_list/',GetListFriendView.as_view()),
     path('', index),
     re_path(r'^(?!media/|static/|assets/).*$', index)
 ]

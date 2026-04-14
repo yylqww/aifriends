@@ -7,7 +7,7 @@ import api from "@/js/http/api.ts";
 import ChatField from "@/components/character/chat_field/ChatField.vue";
 import {useRouter} from "vue-router";
 
-const props = defineProps(['character', 'canEdit'])
+const props = defineProps(['character', 'canEdit', 'canRemoveFriend', 'friendId'])
 const isHover = ref(false)
 const user = useUserStore()
 const emit = defineEmits(['remove'])
@@ -29,6 +29,21 @@ async function handleRemoveCharacter(){
       alert(res.data.result || "删除失败");
     }
   } catch (err) {
+  }
+}
+
+async function handleRemoveFriend(){
+  if (!confirm("确定要和这个角色解除好友关系吗？")) return;
+  try{
+    const res = await api.post('api/friend/remove/',{
+      friend_id: props.friendId,
+    })
+    if(res.data.result === 'success'){
+      emit('remove', props.friendId)
+    }else{
+      alert(res.data.result || "删除失败")
+    }
+  }catch (err){
   }
 }
 
@@ -76,12 +91,23 @@ async function openChatField(){
              class="absolute right-3 top-3 z-30 transition-all duration-500"
              :class="isHover ? 'opacity-100' : 'opacity-0'">
           <div class="flex flex-col gap-1.5 p-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
-            <RouterLink :to="{name: 'update-character', params: {character_id: character.id}}"
+            <RouterLink @click.stop :to="{name: 'update-character', params: {character_id: character.id}}"
                         class="btn btn-square btn-xs btn-ghost text-white hover:bg-primary/40 border-none">
                <UpdateIcon class="w-3.5 h-3.5" />
             </RouterLink>
             <button @click.stop="handleRemoveCharacter"
                     class="btn btn-square btn-xs btn-ghost text-white hover:bg-error/40 border-none">
+              <RemoveIcon class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+        <div v-else-if="canRemoveFriend"
+             class="absolute right-3 top-3 z-30 transition-all duration-500"
+             :class="isHover ? 'opacity-100' : 'opacity-0'">
+          <div class="p-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
+            <button @click.stop="handleRemoveFriend"
+                    class="btn btn-square btn-xs btn-ghost text-white hover:bg-error/60 border-none transition-colors"
+                    title="解除好友关系">
               <RemoveIcon class="w-3.5 h-3.5" />
             </button>
           </div>

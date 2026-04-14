@@ -12,8 +12,6 @@ const sentinelRef = useTemplateRef('sentinel-ref')
 const route = useRoute()
 const router = useRouter()
 
-// 记录当前请求的搜索词，用于解决竞态问题
-let currentSearchTerm = ""
 
 function checkSentinelVisible() {
   if (!sentinelRef.value) return false
@@ -26,7 +24,6 @@ async function loadMore() {
   isLoading.value = true
 
   const searchTermAtRequest = route.query.q || ''
-  currentSearchTerm = searchTermAtRequest
 
   let newCharacters = []
   try {

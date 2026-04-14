@@ -44,7 +44,7 @@ class GetListFriendView(APIView):
 
             return Response({
                 'result': 'success',
-                'friends': friends
+                'friends': friends,
             })
 
         except:

@@ -30,8 +30,16 @@ const modalStyle =  computed(() => {
 
 <template>
   <dialog ref="modal-ref" class="modal">
-    <div class="modal-box w-90 h-150" :style="modalStyle">
-      <button @click="modalRef?.close()" class="btn btn-sm btn-circle btn-ghost bg-transparent absolute right-1 top-1">×</button>
+    <div class="modal-box w-90 h-150 relative" :style="modalStyle">
+      <button @click="modalRef?.close()"
+              class="btn btn-sm btn-circle absolute right-2 top-2 z-50
+                     bg-black/20 hover:bg-red-500/80 border-none
+                     text-white/70 hover:text-white transition-all backdrop-blur-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
       <InputField />
       <CharacterPhotoField v-if="friend" :character="friend.character" />
     </div>
