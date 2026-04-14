@@ -1,0 +1,36 @@
+<script setup lang="ts">
+import {useUserStore} from "@/stores/user.ts";
+
+defineProps(['message', 'character'])
+const user = useUserStore()
+</script>
+
+<template>
+  <div v-if="message.content">
+    <div v-if="message.role === 'ai'" class="chat chat-start">
+      <div class="chat-image avatar">
+        <div class="w-10 rounder-full">
+          <img :src="character.photo " alt="">
+        </div>
+      </div>
+      <div class="chat-bubble whitespace-pre-wrap">
+        {{ message.content }}
+      </div>
+    </div>
+
+    <div v-else class="chat chat-end">
+      <div class="chat-image avatar">
+        <div class="w-10 rounder-full">
+          <img :src="user.photo " alt="">
+        </div>
+      </div>
+      <div class="chat-bubble chat-bubble-success whitespace-pre-wrap">
+        {{ message.content }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+
+</style>

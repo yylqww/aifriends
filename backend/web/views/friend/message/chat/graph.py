@@ -1,7 +1,6 @@
 import os
 from typing import TypedDict, Annotated, Sequence
 
-from django.db.migrations import graph
 from langchain_core.messages import BaseMessage
 from langchain_openai import ChatOpenAI
 from langgraph.constants import START, END
@@ -13,8 +12,14 @@ class ChatGraph:
     def create_app():
         llm = ChatOpenAI(
             model='deepseek-v3.2',
-            openai_api_key=os.getenv('OPENAI_API_KEY'),
-            openai_api_base_url=os.getenv('API_BASE'),
+            api_key=os.getenv('API_KEY'),
+            base_url=os.getenv('API_BASE'),
+            streaming=True,
+            model_kwargs={
+                "stream_options": {
+                    "include_usage": True,  # 输出token消耗数量
+                }
+            }
         )
 
         class AgentState(TypedDict):
