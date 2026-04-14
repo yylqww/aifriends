@@ -90,7 +90,7 @@ defineExpose({ myPhoto })
     <div class="modal-box bg-white p-6 rounded-2xl border-0 shadow-2xl transition-all">
       <div class="flex items-center justify-between mb-4">
         <h3 class="font-bold text-gray-800">裁剪角色头像</h3>
-        <button @click="modalRef?.close()" class="btn btn-sm btn-circle btn-ghost">✕</button>
+        <button @click="modalRef?.close()" class="btn btn-sm bg-transparent btn-circle btn-ghost">×</button>
       </div>
 
       <div ref="croppie-ref" class="flex flex-col justify-center overflow-hidden rounded-xl bg-gray-50" />
