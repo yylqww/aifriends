@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from web.models.friend import Friend, Message, SystemPrompt
 from web.views.friend.message.chat.graph import ChatGraph
+from web.views.friend.message.memory.update import update_memory
 
 
 class SSERenderer(BaseRenderer):
@@ -27,6 +28,7 @@ def add_system_prompt(state, friend):
     for sp in system_prompts:
         prompt += sp.prompt
     prompt += f'\n【角色性格】\n{friend.character.profile}\n'
+    prompt += f'【长期记忆】\n{friend.memory}\n'
     return {'messages': [SystemMessage(prompt)] + msgs}
 
 
@@ -98,6 +100,8 @@ class MessageChatView(APIView):
                             output_tokens=output_tokens,
                             total_tokens=total_tokens,
                         )
+                        if Message.objects.filter(friend=friend).count() % 10 == 0:
+                             update_memory(friend)
                     except Exception as db_err:
 
                         print(f"数据库存入失败: {db_err}")
