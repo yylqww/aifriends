@@ -3,13 +3,14 @@ import { ref, useTemplateRef, onUnmounted } from "vue";
 import streamApi from "@/js/http/streamApi.js";
 import SendIcon from "@/components/navbar/icons/SendIcon.vue";
 import MicIcon from "@/components/navbar/icons/MicIcon.vue";
+import Microphone from "@/components/character/chat_field/input_field/Microphone.vue";
 
 const props = defineProps(['friendId'])
 const emit = defineEmits(['pushBackMessage', 'addToLastMessage'])
 const inputRef = useTemplateRef('input-ref')
 const message = ref('')
 
-
+const showMic = ref(false)
 let abortActiveRequest = null
 let processId = 0
 
@@ -17,8 +18,13 @@ function focus() {
   inputRef.value.focus()
 }
 
-async function handleSend() {
-  const content = message.value.trim()
+async function handleSend(event, audio_msg) {
+  let content
+  if(audio_msg) {
+    content = audio_msg.trim()
+  }else{
+    content = message.value.trim()
+  }
   if (!content) return
 
   if (abortActiveRequest) {
@@ -69,13 +75,23 @@ onUnmounted(() => {
   }
 })
 
+function close() {
+  ++ processId
+  showMic.value = false
+}
+
+function handleStop() {
+  ++ processId
+}
+
 defineExpose({
   focus,
+  close,
 })
 </script>
 
 <template>
-  <form @submit.prevent="handleSend" class="absolute bottom-4 left-2 h-12 w-86 flex items-center">
+  <form v-if="!showMic" @submit.prevent="handleSend" class="absolute bottom-4 left-2 h-12 w-86 flex items-center">
     <input
         ref="input-ref"
         v-model="message"
@@ -86,10 +102,16 @@ defineExpose({
     <div @click="handleSend" class="absolute right-2 w-8 h-8 flex justify-center items-center cursor-pointer">
       <SendIcon />
     </div>
-    <div class="absolute right-10 w-8 h-8 flex justify-center items-center cursor-pointer">
+    <div @click="showMic = true" class="absolute right-10 w-8 h-8 flex justify-center items-center cursor-pointer">
       <MicIcon />
     </div>
   </form>
+  <Microphone
+      v-else
+      @close="showMic = false"
+      @send="handleSend"
+      @stop="handleStop"
+  />
 </template>
 
 <style scoped>

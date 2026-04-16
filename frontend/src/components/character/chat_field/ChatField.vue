@@ -35,6 +35,11 @@ function handlePushFrontMessage(msg){
   history.value.unshift(msg)
 }
 
+function handleClose(){
+  modalRef?.value.close()
+  inputRef.value.close()
+}
+
 defineExpose({
   showModal,
 })
@@ -56,7 +61,7 @@ const modalStyle =  computed(() => {
 <template>
   <dialog ref="modal-ref" class="modal">
     <div class="modal-box w-90 h-150 relative" :style="modalStyle">
-      <button @click="modalRef?.close()"
+      <button @click="handleClose()"
               class="btn btn-sm btn-circle absolute right-2 top-2 z-50
                      bg-black/20 hover:bg-red-500/80 border-none
                      text-white/70 hover:text-white transition-all backdrop-blur-md">
