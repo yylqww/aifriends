@@ -49,7 +49,6 @@ export default async function streamApi(url, options = {}) {
 
                 onerror(err) {
                     if (err.name === 'AbortError') {
-                        console.log("请求已主动取消");
                         throw err; 
                     }
                     if (err.message === "TOKEN_REFRESHED") {

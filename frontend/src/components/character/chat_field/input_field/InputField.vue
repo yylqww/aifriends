@@ -13,30 +13,96 @@ const message = ref('')
 const showMic = ref(false)
 let abortActiveRequest = null
 let processId = 0
+let mediaSource = null;
+let sourceBuffer = null;
+let audioPlayer = new Audio();
+let audioQueue = [];
+let isUpdating = false;
+
+const initAudioStream = () => {
+    stopAudio();
+    audioQueue = [];
+    isUpdating = false;
+    mediaSource = new MediaSource();
+    audioPlayer.src = URL.createObjectURL(mediaSource);
+    mediaSource.addEventListener('sourceopen', () => {
+        try {
+            sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+            sourceBuffer.addEventListener('updateend', () => {
+                isUpdating = false;
+                processQueue();
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    });
+    audioPlayer.play().catch(() => {});
+};
+
+const processQueue = () => {
+    if (isUpdating || audioQueue.length === 0 || !sourceBuffer || sourceBuffer.updating || mediaSource?.readyState !== 'open') {
+        return;
+    }
+    isUpdating = true;
+    const chunk = audioQueue.shift();
+    try {
+        sourceBuffer.appendBuffer(chunk);
+    } catch (e) {
+        isUpdating = false;
+    }
+};
+
+const stopAudio = () => {
+    audioPlayer.pause();
+    audioQueue = [];
+    isUpdating = false;
+    if (mediaSource) {
+        if (mediaSource.readyState === 'open') {
+            try {
+                mediaSource.endOfStream();
+            } catch (e) {}
+        }
+        mediaSource = null;
+    }
+    if (audioPlayer.src) {
+        URL.revokeObjectURL(audioPlayer.src);
+        audioPlayer.src = '';
+    }
+};
+
+const handleAudioChunk = (base64Data) => {
+    try {
+        const binaryString = atob(base64Data);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        audioQueue.push(bytes);
+        processQueue();
+    } catch (e) {}
+};
 
 function focus() {
-  inputRef.value.focus()
+  inputRef.value?.focus()
 }
 
 async function handleSend(event, audio_msg) {
-  let content
-  if(audio_msg) {
-    content = audio_msg.trim()
-  }else{
-    content = message.value.trim()
-  }
-  if (!content) return
+  let content = audio_msg ? audio_msg.trim() : message.value.trim();
+  if (!content) return;
 
   if (abortActiveRequest) {
-    abortActiveRequest()
-    abortActiveRequest = null
+    abortActiveRequest();
+    abortActiveRequest = null;
   }
+  stopAudio();
 
-  const curId = ++processId
-  message.value = ''
+  initAudioStream();
+  const curId = ++processId;
+  message.value = '';
 
-  emit('pushBackMessage', { role: 'user', content: content, id: crypto.randomUUID() })
-  emit('pushBackMessage', { role: 'ai', content: '', id: crypto.randomUUID() })
+  emit('pushBackMessage', { role: 'user', content: content, id: crypto.randomUUID() });
+  emit('pushBackMessage', { role: 'ai', content: '', id: crypto.randomUUID() });
 
   try {
     abortActiveRequest = await streamApi('/api/friend/message/chat/', {
@@ -45,44 +111,55 @@ async function handleSend(event, audio_msg) {
         message: content,
       },
       onmessage(data, isDone) {
-        if (curId !== processId) return
-
+        if (curId !== processId) return;
         if (data.content) {
-          emit('addToLastMessage', data.content)
+          emit('addToLastMessage', data.content);
         }
-
+        if (data.audio) {
+          handleAudioChunk(data.audio);
+        }
         if (isDone) {
-          abortActiveRequest = null
+          abortActiveRequest = null;
         }
       },
-      onerror(err) {
-
-        abortActiveRequest = null
-        console.error("Stream error:", err)
+      onerror() {
+        abortActiveRequest = null;
       },
       onclose() {
-        abortActiveRequest = null
+        abortActiveRequest = null;
       }
-    })
+    });
   } catch (err) {
-    abortActiveRequest = null
+    abortActiveRequest = null;
+  }
+}
+
+function handleStop() {
+  ++processId;
+  stopAudio();
+  if (abortActiveRequest) {
+    abortActiveRequest();
+    abortActiveRequest = null;
+  }
+}
+
+function close() {
+  ++processId;
+  showMic.value = false;
+  stopAudio();
+  if (abortActiveRequest) {
+    abortActiveRequest();
+    abortActiveRequest = null;
   }
 }
 
 onUnmounted(() => {
+  ++processId;
+  stopAudio();
   if (abortActiveRequest) {
-    abortActiveRequest()
+    abortActiveRequest();
   }
-})
-
-function close() {
-  ++ processId
-  showMic.value = false
-}
-
-function handleStop() {
-  ++ processId
-}
+});
 
 defineExpose({
   focus,
