@@ -19,6 +19,7 @@ let audioPlayer = new Audio();
 let audioQueue = [];
 let isUpdating = false;
 
+// --- 逻辑部分：保持原样 ---
 const initAudioStream = () => {
     stopAudio();
     audioQueue = [];
@@ -168,28 +169,61 @@ defineExpose({
 </script>
 
 <template>
-  <form v-if="!showMic" @submit.prevent="handleSend" class="absolute bottom-4 left-2 h-12 w-86 flex items-center">
-    <input
+  <div class="fixed bottom-6 left-0 w-full flex justify-center px-4 pointer-events-none">
+    <form
+      v-if="!showMic"
+      @submit.prevent="handleSend"
+      class="pointer-events-auto relative flex items-center w-full max-w-lg h-14 group transition-all duration-300"
+    >
+      <input
         ref="input-ref"
         v-model="message"
-        class="input bg-black/30 backdrop-blur-sm text-white text-base w-full h-full rounded-2xl pr-20"
+        class="w-full h-full bg-black/40 backdrop-blur-xl text-white text-base rounded-2xl px-5 pr-24 border border-white/10 outline-none focus:border-white/30 focus:ring-4 focus:ring-white/5 transition-all placeholder:text-white/30 shadow-2xl"
         type="text"
-        placeholder="文本输入..."
-    >
-    <div @click="handleSend" class="absolute right-2 w-8 h-8 flex justify-center items-center cursor-pointer">
-      <SendIcon />
-    </div>
-    <div @click="showMic = true" class="absolute right-10 w-8 h-8 flex justify-center items-center cursor-pointer">
-      <MicIcon />
-    </div>
-  </form>
-  <Microphone
-      v-else
-      @close="showMic = false"
-      @send="handleSend"
-      @stop="handleStop"
-  />
+        placeholder="输入消息..."
+      >
+
+      <div class="absolute right-2 flex items-center space-x-1">
+        <div
+          @click="showMic = true"
+          class="w-10 h-10 flex justify-center items-center rounded-xl cursor-pointer text-white/60 hover:text-white hover:bg-white/10 active:scale-90 transition-all"
+        >
+          <MicIcon class="w-6 h-6" />
+        </div>
+
+        <button
+          type="submit"
+          :disabled="!message.trim()"
+          class="w-10 h-10 flex justify-center items-center rounded-xl bg-white/10 text-white hover:bg-white/20 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
+        >
+          <SendIcon class="w-5 h-5" />
+        </button>
+      </div>
+    </form>
+
+    <Microphone
+        v-else
+        class="pointer-events-auto shadow-2xl scale-105"
+        @close="showMic = false"
+        @send="handleSend"
+        @stop="handleStop"
+    />
+  </div>
 </template>
 
 <style scoped>
+/* 针对 Webkit 内核的输入框平滑处理 */
+input {
+  -webkit-appearance: none;
+}
+
+/* 简单的进入动画 */
+form {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 </style>

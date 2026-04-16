@@ -11,12 +11,13 @@
 import axios from "axios";
 // 注意：下面这些纯类型导入，必须加 type 关键字
 import type {
-    AxiosInstance, 
+    AxiosInstance,
     InternalAxiosRequestConfig,
     AxiosResponse,
     AxiosError
 } from "axios";
 import { useUserStore } from "@/stores/user";
+import CONFIG_API from "@/js/config/config.ts";
 
 // 1. 定义后端返回的 Token 数据结构
 interface TokenResponse {
@@ -30,7 +31,7 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
 }
 
-const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL = CONFIG_API.HTTP_URL
 
 const api: AxiosInstance = axios.create({
     baseURL: BASE_URL,

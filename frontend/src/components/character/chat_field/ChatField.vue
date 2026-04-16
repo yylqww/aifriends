@@ -36,7 +36,6 @@ function handlePushFrontMessage(msg){
 }
 
 function handleClose(){
-  modalRef?.value.close()
   inputRef.value.close()
 }
 
@@ -59,9 +58,9 @@ const modalStyle =  computed(() => {
 </script>
 
 <template>
-  <dialog ref="modal-ref" class="modal">
+  <dialog ref="modal-ref" class="modal" @close="handleClose">
     <div class="modal-box w-90 h-150 relative" :style="modalStyle">
-      <button @click="handleClose()"
+      <button @click="modalRef.close()"
               class="btn btn-sm btn-circle absolute right-2 top-2 z-50
                      bg-black/20 hover:bg-red-500/80 border-none
                      text-white/70 hover:text-white transition-all backdrop-blur-md">
