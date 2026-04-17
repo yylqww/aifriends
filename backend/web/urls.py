@@ -6,6 +6,7 @@ from web.views.create.character.get_list import GetListCharacter
 from web.views.create.character.get_single import GetSingleCharacter
 from web.views.create.character.remove import RemoveCharacter
 from web.views.create.character.update import UpdateCharacter
+from web.views.create.character.voice.get_list import GetVoiceList
 from web.views.friend.get_list import GetListFriendView
 from web.views.friend.get_or_create import GetOrCreateView
 from web.views.friend.message.asr.asr import ASRView
@@ -40,6 +41,7 @@ urlpatterns = [
     path('api/friend/message/chat/', MessageChatView.as_view()),
     path('api/friend/message/get_history/',GetHistoryView.as_view()),
     path('api/friend/message/asr/',ASRView.as_view()),
+    path('api/create/character/voice/get_list/', GetVoiceList.as_view()),
     path('', index),
     re_path(r'^(?!media/|static/|assets/).*$', index)
 ]

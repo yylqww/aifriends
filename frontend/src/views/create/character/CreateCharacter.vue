@@ -1,17 +1,19 @@
-<script setup lang="ts">
+<script setup>
 import Photo from "@/views/create/character/components/Photo.vue";
 import Profile from "@/views/create/character/components/Profile.vue";
 import BackgroundImage from "@/views/create/character/components/BackgroundImage.vue";
 import Name from "@/views/create/character/components/Name.vue";
-import { ref, useTemplateRef } from "vue";
+import {onMounted, ref, useTemplateRef} from "vue";
 import { base64ToFile } from "@/js/utils/base64_to_file.ts";
 import api from "@/js/http/api.ts";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user.ts";
+import Voice from "@/views/create/character/components/Voice.vue";
 
 const photoRef = useTemplateRef('photo-ref')
 const nameRef = useTemplateRef('name-ref')
 const profileRef = useTemplateRef('profile-ref')
+const voiceRef = useTemplateRef('voice-ref')
 const backgroundImageRef = useTemplateRef('background-image-ref')
 
 const errorMessage = ref('')
@@ -19,21 +21,39 @@ const isSubmitting = ref(false)
 const user = useUserStore()
 const router = useRouter()
 
+const voices = ref([])
+const curVoiceId = ref(null)
+
+onMounted(async () => {
+  try{
+    const res = await api.get('/api/create/character/voice/get_list/',{})
+    const data = res.data
+    if(data.result === 'success') {
+      voices.value = data.voices
+      curVoiceId.value = data.voices[0].id
+    }
+  }catch (err){
+  }
+})
+
 async function handleCreate() {
   const photo = photoRef.value?.myPhoto
   const name = nameRef.value?.myName?.trim()
+  const voice = voiceRef.value?.myVoice
   const profile = profileRef.value?.myProfile?.trim()
   const backgroundImage = backgroundImageRef.value?.myBackgroundImage
 
   errorMessage.value = ''
   if (!photo) { errorMessage.value = '头像不能为空'; return; }
   if (!name) { errorMessage.value = '名字不能为空'; return; }
+  if( !voice) { errorMessage.value = '音色不能为空'; return; }
   if (!profile) { errorMessage.value = '角色介绍不能为空'; return; }
   if (!backgroundImage) { errorMessage.value = '聊天背景不能为空'; return; }
 
   isSubmitting.value = true
   const formData = new FormData()
   formData.append('name', name)
+  formData.append('voice_id', voice)
   formData.append('profile', profile)
   formData.append('photo', base64ToFile(photo, 'photo.png'))
   formData.append('background_image', base64ToFile(backgroundImage, 'background_image.png'))
@@ -73,6 +93,9 @@ async function handleCreate() {
 
           <div class="form-group">
             <Name ref="name-ref" />
+          </div>
+          <div class="form-group">
+            <Voice ref="voice-ref" :voices="voices" :curVoiceId="curVoiceId" />
           </div>
 
           <div class="form-group">
