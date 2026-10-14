@@ -1,6 +1,5 @@
 from typing import TypedDict, Annotated, Sequence
 
-from django.db.migrations import graph
 from langchain_core.messages import BaseMessage
 from langchain_openai import ChatOpenAI
 import os
@@ -13,7 +12,7 @@ class MemoryGraph():
     @staticmethod
     def create_app():
         llm =  ChatOpenAI(
-            model='deepseek-v3.2',
+            model='deepseek-v4-pro',
             api_key=os.getenv('API_KEY'),
             base_url=os.getenv('API_BASE'),
         )

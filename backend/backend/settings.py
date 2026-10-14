@@ -109,7 +109,6 @@ else:
 if DEBUG:
     MEDIA_URL = 'http://127.0.0.1:8000/media/'
 else:
-    # 修正：之前这里是 Media_URL，改为全部大写
     MEDIA_URL = 'https://app7986.acapp.acwing.com.cn/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'

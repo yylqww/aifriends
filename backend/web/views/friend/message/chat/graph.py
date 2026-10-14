@@ -26,7 +26,7 @@ class ChatGraph:
 
         @tool
         def search_knowledge_base(query: str) -> str:
-            """当用户查询阿里云百炼平台的相关信息时，调用此函数。输入为要查询的问题，输出为查询结果。"""
+            """当用户查询windows云服务器时，调用此函数。输入为要查询的问题，输出为查询结果。"""
             db = lancedb.connect('./web/documents/lancedb_storage')
             embeddings = CustomEmbeddings()
             vector_db = LanceDB(
@@ -41,7 +41,7 @@ class ChatGraph:
         tools = [get_time, search_knowledge_base]
 
         llm = ChatOpenAI(
-            model='deepseek-v3.2',
+            model='deepseek-v4-pro',
             api_key=os.getenv('API_KEY'),
             base_url=os.getenv('API_BASE'),
             streaming=True,
